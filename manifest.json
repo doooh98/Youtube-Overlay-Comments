@@ -1,0 +1,37 @@
+{
+  
+  "name": "Youtube Overlay Comments",
+  "version": "0.1.0",
+  "description": "EchoLab",
+  "manifest_version": 3,
+  "action":{
+    "default_popup": "popup.html",
+    "default_title": "YTC",
+    "default_icon": "ext-icon.png"
+  },
+  "icons": {
+    "16": "./ext-icon.png",
+    "32": "./ext-icon.png",
+    "48": "./ext-icon.png",
+    "128": "./ext-icon.png"
+  },
+  "background": {
+    "service_worker": "./background.js"
+  },
+  "permissions": [
+    "webNavigation", "webRequest",
+    "scripting",
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.youtube.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content-script.js", "jquery-3.4.1.min.js"]
+    }
+  ]
+}

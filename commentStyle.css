@@ -1,0 +1,20 @@
+.popup-comment {
+  padding: 5px;
+  width: 200px;
+  height: fit-content;
+  background-color: #E3D6C1;
+  font-size: 1em;
+  color: black;
+
+  opacity: 0.01;
+
+  border: 2px solid grey;
+  border-radius: 2px;
+  box-shadow: 5px 5px 20px grey;
+
+  position: absolute;
+  left: 0%;
+  top: 0%;
+
+  transform: translate(-50%, -50%); 
+}
