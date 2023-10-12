@@ -3,6 +3,8 @@ let comments = [];
 let timestamp_comments = [];
 let videoCurrentSec = 0.0;
 let interval_id = null;
+let isCommentShowing = false;
+let commentStartTime = null;
 
 chrome.runtime.sendMessage({
   message: 'load_comments',
@@ -24,14 +26,22 @@ function show_comment (author, comment) {
   console.log("show comment");
   // Calculate the duration for which the comment will be displayed
   let duration = 3 + (comment.length / 12.4 * 1000); // reading speed 12.4 CPS by subtitle paper + dragging time
+  commentStartTime = videoCurrentSec; // Current video time is the comment's start time
+  
   // let youtube_video = document.querySelector('.video-stream').getBoundingClientRect();
   let overlay_comment = document.createElement('div');
   // // Hide any existing comment
   hideComment();
   // Add the new comment
   currentComment = overlay_comment;
-  // Set a timeout to hide the comment after the duration
-  setTimeout(hideComment, duration);
+  // Set flag to show that a comment is currently being displayed
+  isCommentShowing = true;
+  // Use setTimeout to hide the comment after 'duration' and clear the showing flag
+  setTimeout(() => {
+    hideComment();
+    isCommentShowing = false;
+    commentStartTime = null; // Clear the start time when the comment is removed
+  }, duration);
 
   overlay_comment.classList.add('popup-comment');
 
@@ -132,7 +142,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     interval_id = setInterval(()=> {
       videoCurrentSec = Math.floor(document.querySelector('.video-stream').currentTime);
       console.log(videoCurrentSec);
-
+      // If a comment is showing, we skip checking other comments
+      if (isCommentShowing) {
+        return;
+      }
       comments.forEach(comment => {
         if(videoCurrentSec < comment.timestamp) {
           if(!timestamp_comments.includes(comment)) {
@@ -144,6 +157,11 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
       timestamp_comments.forEach(timestamp_comment => {
         if (videoCurrentSec == timestamp_comment.timestamp) {
+            // Check the time to ignore comments that should appear while another comment is displayed
+            if (commentStartTime && timestamp_comment.timestamp >= commentStartTime && timestamp_comment.timestamp <= commentStartTime + duration) {
+              // This comment's time falls within the duration of the currently displayed comment, so ignore it
+              return;
+            }
             console.log("below is the timestamp_comment will be shown soon")
             console.log(timestamp_comment);
             // Check if there's a comment currently being displayed
