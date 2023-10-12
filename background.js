@@ -46,6 +46,34 @@ function get_comments(videoId) {
     });
 }
 
+//rank comments have same timestamps
+function prioritizeComments(comments) {
+    let groupedComments = {};
+
+    comments.forEach(comment => {
+        let time = comment.timestamp;
+        if (!groupedComments[time]) groupedComments[time] = [];
+        groupedComments[time].push(comment);
+    });
+
+    let prioritizedComments = [];
+    for (let time in groupedComments) {
+        let group = groupedComments[time];
+        if (group.length === 1) {
+            prioritizedComments.push(group[0]);
+        } else {
+            let highestPriorityComment = group.reduce((prev, current) => {
+                let prevPriority = prev.likeCount * 2 + prev.totalReplyCount;
+                let currentPriority = current.likeCount * 2 + current.totalReplyCount;
+                return prevPriority > currentPriority ? prev : current;
+            });
+            prioritizedComments.push(highestPriorityComment);
+        }
+    }
+
+    return prioritizedComments;
+}
+
 function parseSortComments(comments) {
   console.log("starting of sorting timestamp comments...)");
   const timestamp_regexp = new RegExp('[0-9]{0,2}:[0-9]{1,2}', 'g');
@@ -92,6 +120,8 @@ function parseSortComments(comments) {
     }
   });
   filtered_and_sorted_comments = filtered_and_sorted_comments.sort((a, b) => a.timestamp - b.timestamp);
+  // Use the prioritizeComments function
+  filtered_and_sorted_comments = prioritizeComments(filtered_and_sorted_comments);
 
   console.log("returned filtered comments to the contentscript.js");
   return filtered_and_sorted_comments;
