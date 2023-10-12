@@ -11,10 +11,27 @@ chrome.runtime.sendMessage({
 const bodyList = document.querySelector("body");
 console.log("send Message to load comments");
 
+let currentComment = null; // Keep track of the current comment being displayed
+
+function hideComment() {
+  if (currentComment) {
+    currentComment.remove(); // Remove the comment element from the DOM
+    currentComment = null;
+  }
+}
+
 function show_comment (author, comment) {
   console.log("show comment");
+  // Calculate the duration for which the comment will be displayed
+  let duration = 3 + (comment.length / 12.4 * 1000); // reading speed 12.4 CPS by subtitle paper + dragging time
   // let youtube_video = document.querySelector('.video-stream').getBoundingClientRect();
   let overlay_comment = document.createElement('div');
+  // // Hide any existing comment
+  hideComment();
+  // Add the new comment
+  currentComment = overlay_comment;
+  // Set a timeout to hide the comment after the duration
+  setTimeout(hideComment, duration);
 
   overlay_comment.classList.add('popup-comment');
 
@@ -129,9 +146,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         if (videoCurrentSec == timestamp_comment.timestamp) {
             console.log("below is the timestamp_comment will be shown soon")
             console.log(timestamp_comment);
-            show_comment(timestamp_comment.author, timestamp_comment.comment);
-            timestamp_comments.splice(timestamp_comments.indexOf(timestamp_comment), 1);
-            
+            // Check if there's a comment currently being displayed
+            if (!currentComment) {
+              // If no comment is being displayed, show the new comment
+              show_comment(timestamp_comment.author, timestamp_comment.comment);
+              timestamp_comments.splice(timestamp_comments.indexOf(timestamp_comment), 1);
+            }
         }
       });
     }, 100);

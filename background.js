@@ -42,7 +42,7 @@ function get_comments(videoId) {
     })
     .catch(error => {
       console.log("error occured while parse sort comments function is running")
-      console.error(error);
+      // console.error(error);
     });
 }
 
@@ -56,9 +56,7 @@ function parseSortComments(comments) {
       author: item.snippet.topLevelComment.snippet.authorDisplayName,
       comment:item.snippet.topLevelComment.snippet.textDisplay
     }
-  })
-  
-  
+  }).filter(comment => comment.comment.length <= 68); // Filter comments based on length (blocking too long comments (bad for UI))
 
   filtered_comments.forEach(comment => {
     let matches = comment.comment.match(timestamp_regexp);
