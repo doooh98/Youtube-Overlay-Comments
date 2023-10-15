@@ -86,6 +86,9 @@ function parseSortComments(comments) {
     }
   }).filter(comment => comment.comment.length <= 68); // Filter comments based on length (blocking too long comments (bad for UI))
 
+  // New variables for non-timestamp comments
+  let non_timestamp_comments = [];
+
   filtered_comments.forEach(comment => {
     let matches = comment.comment.match(timestamp_regexp);
     if(matches) {
@@ -96,6 +99,11 @@ function parseSortComments(comments) {
           author: comment.author,
           comment: comment.comment
         });
+      });
+    }else {
+      non_timestamp_comments.push({
+        author: comment.author,
+        comment: comment.comment
       });
     }
   });
@@ -124,7 +132,14 @@ function parseSortComments(comments) {
   filtered_and_sorted_comments = prioritizeComments(filtered_and_sorted_comments);
 
   console.log("returned filtered comments to the contentscript.js");
-  return filtered_and_sorted_comments;
+  // Send both timestamped and non-timestamped comments
+  return {
+    timestampComments: filtered_and_sorted_comments,
+    nonTimestampComments: non_timestamp_comments.sort((a, b) => {
+      // Sorting by popularity: more likes and more replies come first
+      return (b.likeCount * 2 + b.totalReplyCount) - (a.likeCount * 2 + a.totalReplyCount);
+    })
+  };
   
 }
 
@@ -183,8 +198,12 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.message === 'load_comments') {
     console.log("received request from content-script.js");
     console.log("getting comments...");
-    await get_comments(request.videoId);
-    chrome.tabs.sendMessage(sender.tab.id, {message: 'here_are_comments', comments: filtered_and_sorted_comments});
+    let sortedComments = await get_comments(request.videoId);
+    chrome.tabs.sendMessage(sender.tab.id, {
+      message: 'here_are_comments',
+      comments: sortedComments.timestampComments,
+      nonTimestampComments: sortedComments.nonTimestampComments // sending non-timestamp comments
+    });
     chrome.scripting.insertCSS({target:{tabId: sender.tab.id}, files: ['./commentStyle.css']});
     console.log("sent result to content-script.js");
   }

@@ -1,6 +1,7 @@
 const query_params = new URLSearchParams(location.search);
 let comments = [];
 let timestamp_comments = [];
+let nonTimestampComments = [];
 let videoCurrentSec = 0.0;
 let interval_id = null;
 let isCommentShowing = false;
@@ -137,7 +138,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.message === 'here_are_comments') {
     console.log("comments are loaded. results below");
     console.log(request.comments);//console can see the comments
-    comments = request.comments;
+    console.log(request.nonTimestampComments);
+    // Now we separate the incoming comments into two different arrays
+    timestamp_comments = request.comments; 
+    nonTimestampComments = request.nonTimestampComments; 
 
     interval_id = setInterval(()=> {
       videoCurrentSec = Math.floor(document.querySelector('.video-stream').currentTime);
