@@ -7,6 +7,7 @@ let interval_id = null;
 let isCommentShowing = false;
 let commentStartTime = null;
 
+
 chrome.runtime.sendMessage({
   message: 'load_comments',
   videoId: query_params.get('v')
@@ -14,116 +15,97 @@ chrome.runtime.sendMessage({
 const bodyList = document.querySelector("body");
 console.log("send Message to load comments");
 
+
 let currentComment = null; // Keep track of the current comment being displayed
+let commentEndTime = null;  // This will hold when the comment is supposed to be hidden.
+
 
 function hideComment() {
   if (currentComment) {
     currentComment.remove(); // Remove the comment element from the DOM
     currentComment = null;
+    commentEndTime = null;
+    isCommentShowing = false;
   }
 }
+
 
 function show_comment (author, comment) {
   console.log("show comment");
   // Calculate the duration for which the comment will be displayed
-  let duration = 3 + (comment.length / 12.4 * 1000); // reading speed 12.4 CPS by subtitle paper + dragging time
+  let duration = 3 * (3 + (comment.length / 12.4 * 1000)); // reading speed 12.4 CPS by subtitle paper + dragging time
   commentStartTime = videoCurrentSec; // Current video time is the comment's start time
   
-  // let youtube_video = document.querySelector('.video-stream').getBoundingClientRect();
   let overlay_comment = document.createElement('div');
   // // Hide any existing comment
   hideComment();
   // Add the new comment
   currentComment = overlay_comment;
+  commentEndTime = videoCurrentSec + duration / 1000;  // Set when the comment should be hidden.
+
   // Set flag to show that a comment is currently being displayed
   isCommentShowing = true;
-  // Use setTimeout to hide the comment after 'duration' and clear the showing flag
-  setTimeout(() => {
-    hideComment();
-    isCommentShowing = false;
-    commentStartTime = null; // Clear the start time when the comment is removed
-  }, duration);
-
   overlay_comment.classList.add('popup-comment');
 
-  // const center={
-  //   x: youtube_video.left + (youtube_video.width/5),
-  //   y: youtube_video.top + youtube_video.height
-  // }
-//current tab
-  // let new_x = 0.0;
-  // let new_y = 0.0;
-  // let motion_sway = 0.01;
-  // let natural_sway = 0.1;
-  // let animated_value = 0.1;
 
+  
+
+  //below is the css part of comment box(buttons functionality shoudl be implemented)
   inside_Video = document.getElementsByClassName('html5-video-container')[0];
-  overlay_comment.className = "ytp-button" + "comment_overlay"
-  overlay_comment.style = "padding: 30px; position: absolute; cursor: move; z-index: 50000; margin: auto; border: 3px solid green;"
-  // overlay_comment.style.left = `${center.x}px`;
-  // overlay_comment.style.top = `${center.y}px`;
-  let commentText = document.createTextNode(`${author}: ${comment}`);
-  overlay_comment.appendChild(commentText);
-  document.querySelector('body').append(overlay_comment);
-  
-  // let new_opacity = 0.1;
-  // let opacity_speed = 0.007;
+  overlay_comment.className = "comment";
+    // Create and append the author span
+    let authorSpan = document.createElement('span');
+    authorSpan.className = 'author';  
+    authorSpan.textContent = author;
+    overlay_comment.appendChild(authorSpan);
 
+    // Add a line break
+    overlay_comment.appendChild(document.createElement('br'));  
+
+    // Create and append the comment text
+    let commentText = document.createElement('p');
+    commentText.className = 'string'; 
+    commentText.textContent = comment;
+    overlay_comment.appendChild(commentText);
+
+    // Create the refresh button
+    let refreshButton = document.createElement('div');
+    refreshButton.className = 'refresh-btn';
+    refreshButton.innerHTML = '&#8635;'; // Unicode character for "refresh"
+    refreshButton.onclick = function() { /* Define refresh functionality here */ };
+    overlay_comment.appendChild(refreshButton);
+
+    // Create the close button
+    let closeButton = document.createElement('div');
+    closeButton.className = 'close-btn';
+    closeButton.innerHTML = '&times;'; // Unicode character for "x"
+    closeButton.onclick = function() { /* Define close functionality here */ };
+    overlay_comment.appendChild(closeButton);
+
+    // Append the comment div to the body or another container
+    document.querySelector('body').append(overlay_comment);
+  //------
+
+
+
+
+  //below are letting comment dragable----
   function onDrag(e) {
-    console.log('Comment moving');
-    let originalStyles = window.getComputedStyle(overlay_comment)
-    overlay_comment.style.left = parseInt(originalStyles.left) + e.movementX + 'px'
-    overlay_comment.style.top = parseInt(originalStyles.top) + e.movementY + 'px'
-  }
+    console.log('Comment moving');let originalStyles = window.getComputedStyle(overlay_comment);
+    overlay_comment.style.left = parseInt(originalStyles.left) + e.movementX + 'px';
+    overlay_comment.style.top = parseInt(originalStyles.top) + e.movementY + 'px';}
+  function onLetGo() {console.log("comment stopped dragging");document.removeEventListener('mousemove', onDrag);document.removeEventListener('mouseup', onLetGo);}
+  function onGrab() {console.log("comment started dragging");document.addEventListener('mousemove', onDrag);document.addEventListener('mouseup', onLetGo);}
+  overlay_comment.addEventListener('mousedown', onGrab);
+  //-----
 
-  function onLetGo() {
-    console.log("comment stopped dragging");
-    document.removeEventListener('mousemove', onDrag)
-    document.removeEventListener('mouseup', onLetGo)
-  }
 
-  function onGrab() {
-    console.log("comment started dragging");
-    document.addEventListener('mousemove', onDrag)
-    document.addEventListener('mouseup', onLetGo)
-  }
 
-  overlay_comment.addEventListener('mousedown', onGrab)
 
-  function addNewCommentEventHandler() {
-
-    event.stopPropagation();
-    // Handle the bookmark functionality here
-    
-  }
-
+  function addNewCommentEventHandler() {event.stopPropagation();}
   overlay_comment.addEventListener('click', addNewCommentEventHandler);
-     
+
   inside_Video.appendChild(overlay_comment);
-  
-  // function animate() {
-  //   console.log("comment animate(fg)");
-  //   console.log(author);
-  //   console.log(comment);
-  //   new_y = center.y - animated_value;
-  //   new_x = center.x + (60.0 * Math.sin(motion_sway * animated_value)) + natural_sway;
-
-  //   overlay_comment.style.top = `${new_y}px`;
-  //   overlay_comment.style.left = `${new_x}px`;
-
-  //   new_opacity = Math.sin(opacity_speed*animated_value);
-  //   overlay_comment.style.opacity = new_opacity;
-
-  //   animated_value = (animated_value + 1);
-
-  //   if (overlay_comment.style.opacity < 0) {
-  //     return;
-  //   } else {
-  //     requestAnimationFrame(animate);
-  //   }
-  // }
-
-  // animate();
 }
 
 
@@ -137,47 +119,47 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log("onMessage(fg)");
   if (request.message === 'here_are_comments') {
     console.log("comments are loaded. results below");
-    console.log(request.comments);//console can see the comments
+    console.log(request.comments);
     console.log(request.nonTimestampComments);
-    // Now we separate the incoming comments into two different arrays
     timestamp_comments = request.comments; 
     nonTimestampComments = request.nonTimestampComments; 
 
     interval_id = setInterval(()=> {
-      videoCurrentSec = Math.floor(document.querySelector('.video-stream').currentTime);
+      let video = document.querySelector('.video-stream');
+      videoCurrentSec = video.currentTime;
       console.log(videoCurrentSec);
-      // If a comment is showing, we skip checking other comments
-      if (isCommentShowing) {
+
+      // If a comment is showing, we check if it's time to hide it
+      if (isCommentShowing && commentEndTime <= videoCurrentSec || commentStartTime >=videoCurrentSec) {
+        hideComment();
+      }
+
+      // If video is not playing, we don't proceed to show comments
+      if (video.paused) {
         return;
       }
-      comments.forEach(comment => {
-        if(videoCurrentSec < comment.timestamp) {
-          if(!timestamp_comments.includes(comment)) {
-            console.log("TimeStamp comments are added on showing comments list");
-            timestamp_comments.push(comment);
-          }
-        }
-      });
 
-      timestamp_comments.forEach(timestamp_comment => {
-        if (videoCurrentSec == timestamp_comment.timestamp) {
-            // Check the time to ignore comments that should appear while another comment is displayed
-            if (commentStartTime && timestamp_comment.timestamp >= commentStartTime && timestamp_comment.timestamp <= commentStartTime + duration) {
-              // This comment's time falls within the duration of the currently displayed comment, so ignore it
-              return;
-            }
-            console.log("below is the timestamp_comment will be shown soon")
-            console.log(timestamp_comment);
-            // Check if there's a comment currently being displayed
-            if (!currentComment) {
-              // If no comment is being displayed, show the new comment
-              show_comment(timestamp_comment.author, timestamp_comment.comment);
-              timestamp_comments.splice(timestamp_comments.indexOf(timestamp_comment), 1);
-            }
+      // Process timestamp comments
+      timestamp_comments.forEach((timestamp_comment, index) => {
+        let commentTime = timestamp_comment.timestamp;
+        let duration = 3 * (3 + (timestamp_comment.comment.length / 12.4 * 1000)) / 1000; // convert to seconds
+
+        // Check if the video time is within the comment's display duration
+        if (videoCurrentSec >= commentTime && videoCurrentSec < (commentTime + duration)) {
+          console.log("below is the timestamp_comment will be shown soon")
+          console.log(timestamp_comment);
+          console.log(duration);
+          // If no comment is being displayed, or if a different comment was being displayed, show the new comment
+          if (!isCommentShowing || commentStartTime !== commentTime) {
+            show_comment(timestamp_comment.author, timestamp_comment.comment);
+            commentStartTime = commentTime;
+            commentEndTime = commentTime + duration;
+          }
         }
       });
     }, 100);
   }
 });
+
 
 console.log("content-script.js running", window.location.href);
