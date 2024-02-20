@@ -28,6 +28,8 @@ function hideComment() {
   }
 }
 
+//for the closing comment box
+let isGloballyMinimized = false;
 
 function show_comment (author, comment) {
   console.log("show comment");
@@ -71,13 +73,48 @@ function show_comment (author, comment) {
     // Create the close button
     let closeButton = document.createElement('div');
     closeButton.className = 'close-btn';
-    closeButton.innerHTML = '&times;'; // Unicode character for "x"
-    closeButton.onclick = function() { /* Define close functionality here */ };
+    // Set initial state based on isGloballyMinimized
+    closeButton.innerHTML = isGloballyMinimized ? '+' : '-';
+    closeButton.style.backgroundColor = isGloballyMinimized ? 'blue' : 'red';
+
+    // Apply initial minimized state if needed
+    if (isGloballyMinimized) {
+        authorSpan.style.display = 'none';
+        commentText.style.display = 'none';
+        overlay_comment.style.width = '0px';
+        overlay_comment.style.height = '0px';
+    } else {
+        // Ensure everything is visible if not minimized
+        authorSpan.style.display = '';
+        commentText.style.display = '';
+        overlay_comment.style.width = ''; // Reset to default or specify a size
+        overlay_comment.style.height = ''; // Reset to default or specify a size
+    }
+
+    closeButton.onclick = function() {
+        isGloballyMinimized = !isGloballyMinimized; // Toggle the global state
+        if (isGloballyMinimized) {
+            // Change to minimized state
+            this.innerHTML = '+';
+            this.style.backgroundColor = 'blue';
+            authorSpan.style.display = 'none';
+            commentText.style.display = 'none';
+            overlay_comment.style.width = '20px';
+            overlay_comment.style.height = '20px';
+        } else {
+            // Expand back
+            this.innerHTML = '-';
+            this.style.backgroundColor = 'red';
+            authorSpan.style.display = '';
+            commentText.style.display = '';
+            overlay_comment.style.width = ''; // Reset to default or specify
+            overlay_comment.style.height = ''; // Reset to default or specify
+        }
+    };
+
     overlay_comment.appendChild(closeButton);
 
-    // Append the comment div to the body or another container
-    document.querySelector('body').append(overlay_comment);
-  //------
+//------
 
 
 
