@@ -49,9 +49,10 @@ p {
   border-radius: 50%;
   color: white;
   cursor: pointer;
-  font-size: 14px;
-  background-color: red;
-  right: 0px; /* Adjust as needed */
-  top: -10px; /* Adjust as needed */
+  font-size: 20px;
+  background-color: red; /* Initial color, will be changed to blue on click */
+  right: 0px;
+  top: -10px;
 }
+
 
