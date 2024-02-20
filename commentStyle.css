@@ -2,7 +2,7 @@
   word-wrap: break-word;
   white-space: normal;
   font-size: 14px;
-  background-color: rgba(255, 255, 255, .9);
+  background-color: rgba(255, 255, 255, .7);
   padding: 5px;
   margin-top: 15px;
   border-top-left-radius: 20px;
@@ -40,7 +40,7 @@ p {
   margin-inline-end: 0px;
 }
 
-.refresh-btn, .close-btn {
+.close-btn {
   position: absolute;
   width: 20px;
   height: 20px;
@@ -50,13 +50,6 @@ p {
   color: white;
   cursor: pointer;
   font-size: 14px;
-}
-.refresh-btn {
-  background-color: green;
-  right: 25px;
-  top: -10px; /* Adjust as needed */
-}
-.close-btn {
   background-color: red;
   right: 0px; /* Adjust as needed */
   top: -10px; /* Adjust as needed */

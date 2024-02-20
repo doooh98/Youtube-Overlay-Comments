@@ -1,7 +1,6 @@
 const query_params = new URLSearchParams(location.search);
 let comments = [];
 let timestamp_comments = [];
-let nonTimestampComments = [];
 let videoCurrentSec = 0.0;
 let interval_id = null;
 let isCommentShowing = false;
@@ -68,12 +67,6 @@ function show_comment (author, comment) {
     commentText.textContent = comment;
     overlay_comment.appendChild(commentText);
 
-    // Create the refresh button
-    let refreshButton = document.createElement('div');
-    refreshButton.className = 'refresh-btn';
-    refreshButton.innerHTML = '&#8635;'; // Unicode character for "refresh"
-    refreshButton.onclick = function() { /* Define refresh functionality here */ };
-    overlay_comment.appendChild(refreshButton);
 
     // Create the close button
     let closeButton = document.createElement('div');
@@ -109,20 +102,12 @@ function show_comment (author, comment) {
 }
 
 
-document.addEventListener('keyup', event => {
-  console.log("keyup a(fg)(stopped program)");
-  if(event.key === 'a') clearInterval(interval_id);
-});
-
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   console.log("onMessage(fg)");
   if (request.message === 'here_are_comments') {
     console.log("comments are loaded. results below");
     console.log(request.comments);
-    console.log(request.nonTimestampComments);
-    timestamp_comments = request.comments; 
-    nonTimestampComments = request.nonTimestampComments; 
+    timestamp_comments = request.comments;
 
     interval_id = setInterval(()=> {
       let video = document.querySelector('.video-stream');

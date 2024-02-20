@@ -42,7 +42,6 @@ function get_comments(videoId) {
     })
     .catch(error => {
       console.log("error occured while parse sort comments function is running")
-      // console.error(error);
     });
 }
 
@@ -86,9 +85,6 @@ function parseSortComments(comments) {
     }
   }).filter(comment => comment.comment.length <= 68); // Filter comments based on length (blocking too long comments (bad for UI))
 
-  // New variables for non-timestamp comments
-  let non_timestamp_comments = [];
-
   filtered_comments.forEach(comment => {
     let matches = comment.comment.match(timestamp_regexp);
     if(matches) {
@@ -99,11 +95,6 @@ function parseSortComments(comments) {
           author: comment.author,
           comment: comment.comment
         });
-      });
-    }else {
-      non_timestamp_comments.push({
-        author: comment.author,
-        comment: comment.comment
       });
     }
   });
@@ -134,51 +125,10 @@ function parseSortComments(comments) {
   console.log("returned filtered comments to the contentscript.js");
   // Send both timestamped and non-timestamped comments
   return {
-    timestampComments: filtered_and_sorted_comments,
-    nonTimestampComments: non_timestamp_comments.sort((a, b) => {
-      // Sorting by popularity: more likes and more replies come first
-      return (b.likeCount * 2 + b.totalReplyCount) - (a.likeCount * 2 + a.totalReplyCount);
-    })
+    timestampComments: filtered_and_sorted_comments
   };
   
 }
-
-// chrome.tabs.onUpdated.addListener(async function(tabId, changeInfo, tab) {
-//   console.log("onUpdated(bg)");
-//   // Look for any change in the URL, not just for a completed load
-//   if(changeInfo.url) {
-//     if(/^https:\/\/www\.youtube\.com\/watch/.test(tab.url)) {
-//       chrome.scripting.insertCSS(
-//         {
-//           target:{
-//             tabId:tabId
-//           }, 
-//           files: ['./commentStyle.css']
-//         }
-//       );
-//       // chrome.scripting.executeScript(
-//       //   {
-//       //     target:{
-//       //       tabId:tabId
-//       //     }, 
-//       //     files: ['./content-script.js']
-//       //   }
-//       // );
-//     }
-
-//   }
-// })
-
-// chrome.tabs.onCreated.addListener(function(tabId, changeInfo, tab) {
-//   console.log("onCreated(bg)");
-//   if(changeInfo.url) {
-//     if(/^https:\/\/www\.youtube\.com\/watch/.test(tab.url)) {
-//       chrome.scripting.insertCSS(tabId, {file: './commentStyle.css'});
-//       chrome.scripting.executeScript(tabId, {file: './foreground.js'});
-//     }
-//   }
-// })
-
 
 chrome.webNavigation.onHistoryStateUpdated.addListener(async function(details) {
   if(/^https:\/\/www\.youtube\.com\/watch/.test(details.url)) {
@@ -201,28 +151,9 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     let sortedComments = await get_comments(request.videoId);
     chrome.tabs.sendMessage(sender.tab.id, {
       message: 'here_are_comments',
-      comments: sortedComments.timestampComments,
-      nonTimestampComments: sortedComments.nonTimestampComments // sending non-timestamp comments
+      comments: sortedComments.timestampComments
     });
     chrome.scripting.insertCSS({target:{tabId: sender.tab.id}, files: ['./commentStyle.css']});
     console.log("sent result to content-script.js");
   }
 });
-
-// chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-//   console.log("onUpdated(bg)");
-//   if(changeInfo.status === 'complete') {
-//     if(/^https:\/\/www\.youtube\/.com\/watch/.test(tab.url)) {
-//       chrome.tabs.insertCSS(tabId, {file: './commentStyle.css'});
-//     }
-//   }
-// })
-
-// chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-//   console.log("onMessage(bg)");
-//   if (request.message === 'load_comments') {
-//     await get_comments(request.videoId);
-//     chrome.tabs.sendMessage(sender.tab.id,
-//        {message: 'here_are_comments', comments: filtered_and_sorted_comments});
-//   }
-// });
