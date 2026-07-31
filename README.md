@@ -1,66 +1,44 @@
-# Youtube Overlay Comments
-This Chrome extension program shows YouTube comments with timestamp one by one on the video screen.
+# YouTube Overlay Comments
 
+A Chrome extension that displays timestamped YouTube comments directly on the video screen.
 
+![Demo Screenshot](https://github.com/doooh98/Youtube-Overlay-Comments/assets/77437338/ee6c2ec3-7d90-4861-90f2-1677a5385f2b)
 
+---
 
-![스크린샷 2024-02-19 오후 9 14 15](https://github.com/doooh98/Youtube-Overlay-Comments/assets/77437338/ee6c2ec3-7d90-4861-90f2-1677a5385f2b)
+## Installation
 
+### Manual Installation (Developer Mode)
 
-# Installation
+1. **Download the Repository**  
+   [Download the zip file](https://github.com/doooh98/Youtube-Overlay-Comments/archive/refs/heads/main.zip) of this project and extract it to a preferred folder on your computer.
 
-## Google Chrome Store
+2. **Configure API Key**  
+   Obtain a **YouTube Data API v3 key** (you can follow [this video tutorial](https://www.youtube.com/watch?v=SIm2W9TtzR0) up to 1:00). Paste your generated key into the `api.js` file.
 
-The easiest way to install the extension from the Google Chrome Store.
-Click the link below and you should see a prompt to install it in Chrome.
+3. **Open Chrome Extensions Page**  
+   Open Google Chrome, navigate to `chrome://extensions/` in your address bar, and toggle on **Developer mode** in the top-right corner.
 
-## Manual Installation
+   ![Enable Developer Mode](https://github.com/doooh98/Youtube-Overlay-Comments/assets/77437338/99e10d20-b4dd-4355-9826-47721627b48e)
 
-First, [Download](https://github.com/doooh98/Youtube-Overlay-Comments/archive/refs/heads/main.zip)
- this project and unzip it somewhere on your computer.
+4. **Load the Unpacked Extension**  
+   Click the **Load unpacked** button in the top-left menu.
 
- 
-Second, [Get an YouTube Data API v3 key](https://www.youtube.com/watch?v=SIm2W9TtzR0) (watch until 1:00), and put your API key on api.js file.
+   ![Click Load Unpacked](https://github.com/doooh98/Youtube-Overlay-Comments/assets/77437338/e1e296bd-3d50-4569-94cc-80e80c91ae0b)
 
+5. **Select Folder & Enable**  
+   Select the extracted project folder. Ensure the extension is switched **ON** in your list of installed extensions.
 
-Third, Go to Window and click Extensions (or enter this in your address bar [chrome://extensions/](chrome://extensions/))
-Turn on **Developer Mode** on the right top corner.
-
-
-
-![스크린샷 2024-02-19 오후 10 11 12](https://github.com/doooh98/Youtube-Overlay-Comments/assets/77437338/99e10d20-b4dd-4355-9826-47721627b48e)
-
-
-
-That will show a new set of options. Click **"Load Unpacked"**
-
-![스크린샷 2024-02-19 오후 10 12 20](https://github.com/doooh98/Youtube-Overlay-Comments/assets/77437338/e1e296bd-3d50-4569-94cc-80e80c91ae0b)
-
-
-
-Choose the **folder you downloaded** the extension into, and you should see it now in your list of extensions!
-
-
-
-Make sure that you turn on the extension which loaded!
-
-
-
-
+---
 
 ## Usage
 
-If you go to any video on YouTube, it'll run automatically. Enjoy!
+Navigate to any video on YouTube—the extension will launch automatically and overlay timestamped comments on the video. Enjoy!
 
+---
 
+## Credits & Acknowledgments
 
+This project was originally initiated at [EchoLab](https://echolab.cs.vt.edu/) to research how draggable, timestamped comment overlays affect user experience during video playback. While initial user testing indicated that draggable interface elements added unintended friction—leading to a pause in active research—the core overlay functionality remains fully open and usable.
 
-
-## Credit
-[EchoLab](https://echolab.cs.vt.edu/) Youtube Overlay Comments Chrome Extension
-
-
-The project was originally started to research how it affects users by overlaying dragable time-stamped comments boxes on YouTube videos. However, during the development, the project was suspended after realizing that dragable interfaces caused inconvenience to users.
-
-
-Thank you to [SangWon Lee Professor](https://echolab.cs.vt.edu/sangwonlee/), [Emily Altland Master](https://github.com/ealtland99) for the great opportunity and feedback.
+Special thanks to **[Prof. SangWon Lee](https://echolab.cs.vt.edu/sangwonlee/)** and **[Emily Altland](https://github.com/ealtland99)** for their valuable guidance, feedback, and support throughout this project.
